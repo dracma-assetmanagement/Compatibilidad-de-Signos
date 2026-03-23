@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compatibilidad de Signos — Fin Silver</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:#f2f2f2;color:#1a1a1a;min-height:100vh;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;background:#f2f2f2;border-bottom:1px solid #e0e0e0;}
+.header-brand{display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.header-brand .fin{color:#1a1a1a;}.header-brand .silver{color:#999;}
+.header-nav a{color:#666;text-decoration:none;font-size:.82rem;font-weight:400;letter-spacing:.5px;transition:color .2s;}
+.header-nav a:hover{color:#1a1a1a;}
+.main{max-width:800px;margin:0 auto;padding:40px 20px 60px;}
+.page-title{text-align:center;font-size:2rem;font-weight:600;margin-bottom:6px;}
+.page-subtitle{text-align:center;color:#888;font-size:.95rem;font-weight:300;margin-bottom:40px;}
+.card{background:#fff;border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.card-title{font-size:.85rem;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:20px;}
+
+/* SIGN SELECTOR */
+.selector-section{display:flex;align-items:center;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+.sign-picker{text-align:center;flex:1;min-width:200px;}
+.sign-picker-label{font-size:.8rem;color:#999;letter-spacing:.5px;margin-bottom:12px;text-transform:uppercase;}
+.sign-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.sign-btn{border:2px solid #eee;background:#fafafa;border-radius:12px;padding:10px 4px;cursor:pointer;transition:all .2s;text-align:center;}
+.sign-btn:hover{border-color:#ccc;background:#f5f5f5;}
+.sign-btn.selected{border-color:#1a1a1a;background:#1a1a1a;color:#fff;}
+.sign-btn .sign-emoji{font-size:1.4rem;display:block;margin-bottom:2px;}
+.sign-btn .sign-name{font-size:.65rem;font-weight:500;letter-spacing:.3px;}
+.sign-btn.selected .sign-name{color:#fff;}
+.vs-circle{width:50px;height:50px;border-radius:50%;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;}
+
+.btn{padding:14px 28px;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-primary{background:#1a1a1a;color:#fff;width:100%;margin-top:16px;}
+.btn-primary:hover{background:#333;}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed;}
+.btn-secondary{background:#f2f2f2;color:#1a1a1a;border:1.5px solid #e0e0e0;}
+.btn-secondary:hover{background:#e8e8e8;}
+
+/* RESULTS */
+.hidden{display:none;}
+
+/* Compatibility ring */
+.compat-ring-section{text-align:center;margin-bottom:24px;}
+.compat-ring-container{position:relative;width:180px;height:180px;margin:0 auto 12px;}
+.compat-ring-container canvas{width:180px;height:180px;}
+.compat-percent{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.8rem;font-weight:700;}
+.compat-label-text{font-size:1.1rem;font-weight:500;color:#555;}
+.compat-signs-display{font-size:1.3rem;margin-top:6px;}
+
+/* Category bars */
+.cat-grid{display:flex;flex-direction:column;gap:14px;margin-top:8px;}
+.cat-item{display:flex;align-items:center;gap:14px;}
+.cat-icon{font-size:1.3rem;width:36px;text-align:center;}
+.cat-info{flex:1;}
+.cat-name{font-size:.85rem;font-weight:500;margin-bottom:4px;}
+.cat-bar-bg{height:8px;background:#eee;border-radius:4px;overflow:hidden;}
+.cat-bar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+.cat-val{font-size:.85rem;font-weight:600;width:40px;text-align:right;}
+
+/* Description */
+.desc-section{margin-top:20px;}
+.desc-title{font-size:.95rem;font-weight:600;margin-bottom:8px;}
+.desc-text{font-size:.88rem;color:#555;line-height:1.6;}
+
+/* Strengths/Challenges */
+.traits-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+.trait-card{padding:16px;border-radius:12px;border:1px solid #eee;background:#fafafa;}
+.trait-card-title{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;font-weight:500;margin-bottom:10px;}
+.trait-card-title.green{color:#22c55e;}
+.trait-card-title.orange{color:#f59e0b;}
+.trait-item{font-size:.85rem;color:#555;padding:4px 0;display:flex;align-items:center;gap:6px;}
+
+/* Advice */
+.advice-box{background:#fafafa;border:1px solid #eee;border-radius:12px;padding:18px;margin-top:16px;}
+.advice-title{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;font-weight:500;color:#999;margin-bottom:8px;}
+.advice-text{font-size:.88rem;color:#555;line-height:1.6;}
+
+/* Element badges */
+.element-row{display:flex;justify-content:center;gap:16px;margin-top:12px;}
+.element-badge{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:.82rem;font-weight:500;background:#fafafa;border:1px solid #eee;}
+
+/* Actions */
+.actions-row{display:flex;gap:12px;margin-top:8px;}
+.actions-row .btn{flex:1;}
+
+.footer{text-align:center;padding:30px 20px;color:#ccc;font-size:.75rem;letter-spacing:1px;}
+
+@media(max-width:600px){
+  .header{padding:14px 18px;}
+  .main{padding:24px 14px 40px;}
+  .page-title{font-size:1.5rem;}
+  .selector-section{flex-direction:column;}
+  .vs-circle{width:36px;height:36px;font-size:.8rem;}
+  .traits-grid{grid-template-columns:1fr;}
+  .actions-row{flex-direction:column;}
+  .sign-grid{grid-template-columns:repeat(4,1fr);gap:6px;}
+  .sign-btn{padding:8px 2px;}
+  .sign-btn .sign-emoji{font-size:1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand"><span class="fin">FIN</span><span class="silver">SILVER</span></div>
+  <div class="header-nav"><a href="#">Herramientas</a></div>
+</div>
+
+<div class="main">
+  <h1 class="page-title">Compatibilidad de Signos</h1>
+  <p class="page-subtitle">Descubrí qué tan compatibles son dos signos del zodíaco</p>
+
+  <div class="card" id="selector-card">
+    <div class="selector-section">
+      <div class="sign-picker">
+        <div class="sign-picker-label">Primer signo</div>
+        <div class="sign-grid" id="grid1"></div>
+      </div>
+      <div class="vs-circle">VS</div>
+      <div class="sign-picker">
+        <div class="sign-picker-label">Segundo signo</div>
+        <div class="sign-grid" id="grid2"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="calc-btn" onclick="calcCompat()" disabled>Descubrir compatibilidad</button>
+  </div>
+
+  <div id="results-section" class="hidden">
+
+    <div class="card">
+      <div class="compat-ring-section">
+        <div class="compat-signs-display" id="signs-display"></div>
+        <div class="compat-ring-container"><canvas id="ring-canvas" width="360" height="360"></canvas><div class="compat-percent" id="percent-text">0%</div></div>
+        <div class="compat-label-text" id="compat-label"></div>
+      </div>
+      <div class="element-row" id="element-row"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Compatibilidad por área</div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Análisis de la pareja</div>
+      <div class="desc-text" id="desc-text"></div>
+      <div class="traits-grid">
+        <div class="trait-card">
+          <div class="trait-card-title green">✦ Fortalezas</div>
+          <div id="strengths-list"></div>
+        </div>
+        <div class="trait-card">
+          <div class="trait-card-title orange">✦ Desafíos</div>
+          <div id="challenges-list"></div>
+        </div>
+      </div>
+      <div class="advice-box">
+        <div class="advice-title">💡 Consejo</div>
+        <div class="advice-text" id="advice-text"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Análisis de la amistad</div>
+      <div class="desc-text" id="friend-desc-text"></div>
+      <div class="traits-grid">
+        <div class="trait-card">
+          <div class="trait-card-title green">✦ Fortalezas</div>
+          <div id="friend-strengths-list"></div>
+        </div>
+        <div class="trait-card">
+          <div class="trait-card-title orange">✦ Desafíos</div>
+          <div id="friend-challenges-list"></div>
+        </div>
+      </div>
+      <div class="advice-box">
+        <div class="advice-title">💡 Consejo para la amistad</div>
+        <div class="advice-text" id="friend-advice-text"></div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-secondary" onclick="downloadPDF()">📄 Descargar PDF</button>
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 Probar otra combinación</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">GRUPO FIN-SILVER</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const signs = [
+  {name:'Aries',emoji:'♈',element:'Fuego',elemEmoji:'🔥',dates:'21 Mar - 19 Abr',quality:'Cardinal'},
+  {name:'Tauro',emoji:'♉',element:'Tierra',elemEmoji:'🌍',dates:'20 Abr - 20 May',quality:'Fijo'},
+  {name:'Géminis',emoji:'♊',element:'Aire',elemEmoji:'💨',dates:'21 May - 20 Jun',quality:'Mutable'},
+  {name:'Cáncer',emoji:'♋',element:'Agua',elemEmoji:'💧',dates:'21 Jun - 22 Jul',quality:'Cardinal'},
+  {name:'Leo',emoji:'♌',element:'Fuego',elemEmoji:'🔥',dates:'23 Jul - 22 Ago',quality:'Fijo'},
+  {name:'Virgo',emoji:'♍',element:'Tierra',elemEmoji:'🌍',dates:'23 Ago - 22 Sep',quality:'Mutable'},
+  {name:'Libra',emoji:'♎',element:'Aire',elemEmoji:'💨',dates:'23 Sep - 22 Oct',quality:'Cardinal'},
+  {name:'Escorpio',emoji:'♏',element:'Agua',elemEmoji:'💧',dates:'23 Oct - 21 Nov',quality:'Fijo'},
+  {name:'Sagitario',emoji:'♐',element:'Fuego',elemEmoji:'🔥',dates:'22 Nov - 21 Dic',quality:'Mutable'},
+  {name:'Capricornio',emoji:'♑',element:'Tierra',elemEmoji:'🌍',dates:'22 Dic - 19 Ene',quality:'Cardinal'},
+  {name:'Acuario',emoji:'♒',element:'Aire',elemEmoji:'💨',dates:'20 Ene - 18 Feb',quality:'Fijo'},
+  {name:'Piscis',emoji:'♓',element:'Agua',elemEmoji:'💧',dates:'19 Feb - 20 Mar',quality:'Mutable'}
+];
+
+// Compatibility matrix [i][j] = overall %, symmetric
+const compatMatrix = [
+//  Ari  Tau  Gem  Can  Leo  Vir  Lib  Esc  Sag  Cap  Acu  Pis
+  [ 78,  42,  72,  47,  93,  53,  85,  50,  93,  47,  78,  55 ], // Aries
+  [ 42,  82,  38,  88,  55,  90,  62,  88,  35,  95,  42,  85 ], // Tauro
+  [ 72,  38,  75,  45,  78,  55,  88,  40,  82,  38,  90,  52 ], // Geminis
+  [ 47,  88,  45,  80,  48,  78,  42,  94,  38,  62,  35,  92 ], // Cancer
+  [ 93,  55,  78,  48,  80,  55,  90,  58,  88,  45,  72,  48 ], // Leo
+  [ 53,  90,  55,  78,  55,  75,  60,  88,  42,  88,  48,  72 ], // Virgo
+  [ 85,  62,  88,  42,  90,  60,  72,  55,  78,  48,  85,  45 ], // Libra
+  [ 50,  88,  40,  94,  58,  88,  55,  78,  48,  72,  52,  90 ], // Escorpio
+  [ 93,  35,  82,  38,  88,  42,  78,  48,  80,  40,  85,  55 ], // Sagitario
+  [ 47,  95,  38,  62,  45,  88,  48,  72,  40,  82,  52,  72 ], // Capricornio
+  [ 78,  42,  90,  35,  72,  48,  85,  52,  85,  52,  75,  55 ], // Acuario
+  [ 55,  85,  52,  92,  48,  72,  45,  90,  55,  72,  55,  78 ]  // Piscis
+];
+
+// Category offsets from overall (love, friendship, communication, work, intimacy)
+const catOffsets = {
+  same_element: [5,8,3,4,7],
+  compatible_element: [3,5,2,3,4],
+  neutral: [0,0,0,0,0],
+  challenging: [-3,-2,2,-1,-4]
+};
+
+function getElementRelation(e1, e2) {
+  if (e1 === e2) return 'same_element';
+  const compat = {Fuego:'Aire',Aire:'Fuego',Tierra:'Agua',Agua:'Tierra'};
+  if (compat[e1] === e2) return 'compatible_element';
+  const challenge = {Fuego:'Agua',Agua:'Fuego',Tierra:'Aire',Aire:'Tierra'};
+  if (challenge[e1] === e2) return 'challenging';
+  return 'neutral';
+}
+
+// Descriptions database
+const descriptions = {};
+function getKey(i,j){ return Math.min(i,j)+'-'+Math.max(i,j); }
+
+function generateDesc(s1, s2, overall) {
+  const descs = {
+    high: [
+      `${s1.name} y ${s2.name} forman una de las combinaciones más potentes del zodíaco. La energía de ${s1.element} de ${s1.name} se complementa naturalmente con la esencia de ${s2.element} de ${s2.name}, creando una conexión que fluye con facilidad. Juntos tienen el potencial de construir algo realmente especial, ya sea en el amor, la amistad o cualquier proyecto compartido.`,
+      `La conexión entre ${s1.name} y ${s2.name} es magnética. Hay una comprensión intuitiva entre estos dos signos que hace que todo parezca natural. ${s1.name} aporta ${s1.element === 'Fuego' ? 'pasión y energía' : s1.element === 'Tierra' ? 'estabilidad y seguridad' : s1.element === 'Aire' ? 'ideas y comunicación' : 'profundidad emocional'}, mientras ${s2.name} complementa con ${s2.element === 'Fuego' ? 'entusiasmo y aventura' : s2.element === 'Tierra' ? 'practicidad y lealtad' : s2.element === 'Aire' ? 'versatilidad y frescura' : 'sensibilidad e intuición'}.`
+    ],
+    medium: [
+      `${s1.name} y ${s2.name} tienen una relación interesante que requiere algo de trabajo pero puede ser muy gratificante. La naturaleza de ${s1.element} de ${s1.name} y la energía de ${s2.element} de ${s2.name} no siempre coinciden a primera vista, pero cuando encuentran el balance, se complementan de formas inesperadas. La clave está en la paciencia y el respeto mutuo.`,
+      `La combinación de ${s1.name} con ${s2.name} es una de esas que crece con el tiempo. Al principio pueden sentir que hablan idiomas diferentes, pero a medida que se conocen descubren que sus diferencias son justamente lo que los enriquece. ${s1.name} necesita aprender de la perspectiva de ${s2.name}, y viceversa.`
+    ],
+    low: [
+      `${s1.name} y ${s2.name} representan un desafío zodiacal. La energía de ${s1.element} de ${s1.name} y la naturaleza de ${s2.element} de ${s2.name} pueden generar fricciones. Sin embargo, las relaciones más desafiantes suelen ser las que más enseñan. Si ambos están dispuestos a crecer, pueden sorprenderse mutuamente.`,
+      `La relación entre ${s1.name} y ${s2.name} no es la más fácil del zodíaco, pero eso no significa que no pueda funcionar. Requiere esfuerzo consciente de ambas partes. Las diferencias fundamentales entre ${s1.element} y ${s2.element} pueden generar tensión, pero también una dinámica fascinante si se maneja con madurez.`
+    ]
+  };
+  const level = overall >= 75 ? 'high' : overall >= 50 ? 'medium' : 'low';
+  return descs[level][Math.floor(Math.random() * descs[level].length)];
+}
+
+function getStrengths(s1, s2, relation) {
+  const pool = {
+    same_element: [
+      'Se entienden sin necesidad de explicar',
+      'Comparten valores fundamentales',
+      'Energía natural y fluida juntos',
+      'Misma forma de ver la vida',
+      'Conexión emocional profunda'
+    ],
+    compatible_element: [
+      'Se complementan perfectamente',
+      'Uno aporta lo que al otro le falta',
+      'Crecimiento mutuo constante',
+      'Buena comunicación natural',
+      'Equilibrio entre dar y recibir'
+    ],
+    neutral: [
+      'Pueden aprender mucho el uno del otro',
+      'La curiosidad los mantiene conectados',
+      'Respeto por las diferencias',
+      'Relación que crece con el tiempo'
+    ],
+    challenging: [
+      'La tensión genera crecimiento personal',
+      'Se desafían mutuamente a mejorar',
+      'Nunca se aburren juntos',
+      'Aprenden a ser más flexibles'
+    ]
+  };
+  const items = pool[relation] || pool.neutral;
+  return items.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function getChallenges(s1, s2, relation) {
+  const pool = {
+    same_element: [
+      'Pueden caer en la monotonía',
+      'Falta de perspectivas nuevas',
+      'Terquedad compartida en desacuerdos'
+    ],
+    compatible_element: [
+      'Uno puede dominar la relación',
+      'Dar por sentado al otro',
+      'Diferentes ritmos de vida'
+    ],
+    neutral: [
+      'Comunicación requiere esfuerzo extra',
+      'Diferentes formas de expresar afecto',
+      'Prioridades distintas en la vida',
+      'Necesitan mucha paciencia'
+    ],
+    challenging: [
+      'Choques de temperamento frecuentes',
+      'Dificultad para entender al otro',
+      'Formas opuestas de manejar conflictos',
+      'Necesidades emocionales muy distintas'
+    ]
+  };
+  const items = pool[relation] || pool.neutral;
+  return items.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function generateFriendDesc(s1, s2, overall) {
+  const descs = {
+    high: [
+      `Como amigos, ${s1.name} y ${s2.name} son un dúo imparable. Se divierten juntos sin esfuerzo y siempre tienen algo de qué hablar. ${s1.name} aporta ${s1.element === 'Fuego' ? 'la energía y las ideas locas' : s1.element === 'Tierra' ? 'la estabilidad y los planes concretos' : s1.element === 'Aire' ? 'las conversaciones infinitas y la creatividad' : 'la profundidad y la lealtad incondicional'}, mientras ${s2.name} suma ${s2.element === 'Fuego' ? 'aventura y espontaneidad' : s2.element === 'Tierra' ? 'contención y consejos prácticos' : s2.element === 'Aire' ? 'frescura y humor' : 'empatía y comprensión genuina'}. Son de esos amigos que pueden no verse por meses y retomar como si nada.`,
+      `La amistad entre ${s1.name} y ${s2.name} es de esas que duran toda la vida. Hay una química natural que hace que estar juntos sea fácil y divertido. Se bancan mutuamente en las buenas y en las malas, y tienen esa capacidad de hacerse reír incluso en los peores momentos.`
+    ],
+    medium: [
+      `La amistad entre ${s1.name} y ${s2.name} es de esas que se construyen con el tiempo. Al principio pueden parecer muy distintos, pero una vez que se conocen de verdad, descubren que se complementan bien. ${s1.name} le enseña a ${s2.name} a ver las cosas desde otra perspectiva, y viceversa. No es la amistad más obvia del zodíaco, pero puede ser de las más enriquecedoras.`,
+      `${s1.name} y ${s2.name} como amigos tienen una dinámica interesante. No siempre coinciden en todo, pero eso es justamente lo que hace que la amistad sea valiosa. Se desafían mutuamente a salir de su zona de confort y a considerar puntos de vista diferentes.`
+    ],
+    low: [
+      `La amistad entre ${s1.name} y ${s2.name} requiere paciencia de ambos lados. Sus formas de ver el mundo son bastante distintas, lo que puede generar malentendidos. Sin embargo, si logran aceptar sus diferencias, pueden tener una amistad que los saca de la burbuja y los hace crecer como personas.`,
+      `${s1.name} y ${s2.name} no son los amigos más naturales del zodíaco. Pueden chocar en lo cotidiano y tener formas muy distintas de manejar las situaciones. Pero si hay voluntad de ambos lados, las diferencias pueden convertirse en la mayor riqueza de esta amistad.`
+    ]
+  };
+  const level = overall >= 75 ? 'high' : overall >= 50 ? 'medium' : 'low';
+  return descs[level][Math.floor(Math.random() * descs[level].length)];
+}
+
+function getFriendStrengths(s1, s2, relation) {
+  const pool = {
+    same_element: ['Planes juntos siempre salen bien','Se entienden con una mirada','Confianza total desde el día uno','Mismo sentido del humor','Lealtad inquebrantable'],
+    compatible_element: ['Se complementan en el grupo','Uno organiza y el otro improvisa','Buenos compañeros de aventuras','Se dan los mejores consejos','Equilibrio perfecto entre diversión y seriedad'],
+    neutral: ['Se respetan aunque piensen distinto','Siempre aprenden algo nuevo del otro','Buenos para debatir sin pelearse','Se amplían la perspectiva mutuamente'],
+    challenging: ['Se dicen las verdades sin filtro','Nunca caen en la monotonía','Se empujan a crecer','La honestidad brutal fortalece el vínculo']
+  };
+  return (pool[relation] || pool.neutral).sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function getFriendChallenges(s1, s2, relation) {
+  const pool = {
+    same_element: ['Pueden encerrarse en su burbuja','Falta alguien que los frene','Competencia silenciosa a veces'],
+    compatible_element: ['Uno puede sentirse opacado','Diferentes niveles de energía social','Celos si aparecen otros amigos'],
+    neutral: ['Planes cancelados por distintas prioridades','Tiempos de respuesta muy diferentes','Formas distintas de demostrar cariño'],
+    challenging: ['Malentendidos frecuentes por WhatsApp','Uno necesita más espacio que el otro','Discusiones que escalan rápido','Formas opuestas de divertirse']
+  };
+  return (pool[relation] || pool.neutral).sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function getFriendAdvice(s1, s2, overall) {
+  if (overall >= 80) return `${s1.name} y ${s2.name} tienen una amistad de esas que se dan naturalmente. El consejo es cuidarla: no dejen de hacer planes juntos, mantengan las tradiciones compartidas y estén presentes cuando el otro los necesite. Tienen oro en las manos.`;
+  if (overall >= 60) return `La amistad entre ${s1.name} y ${s2.name} tiene mucho potencial. La clave está en respetar los tiempos del otro y no tomarse personal las diferencias. Busquen actividades que disfruten ambos y dejen que la amistad crezca orgánicamente.`;
+  if (overall >= 45) return `Para que la amistad entre ${s1.name} y ${s2.name} funcione, necesitan aceptar que son distintos y que eso está bien. No intenten forzar al otro a ser como ustedes. Las mejores amistades a veces son con personas que nos complementan, no que nos copian.`;
+  return `${s1.name} y ${s2.name} pueden ser amigos, pero va a requerir esfuerzo consciente. El consejo es empezar con actividades compartidas donde las diferencias no choquen tanto, e ir construyendo confianza de a poco. No todo tiene que ser intenso.`;
+}
+
+function getAdvice(s1, s2, overall) {
+  if (overall >= 80) return `${s1.name} y ${s2.name} tienen una conexión natural envidiable. El consejo es no confiarse: las mejores relaciones también necesitan cuidado. Sigan sorprendiéndose mutuamente y no pierdan la chispa que los hace tan compatibles.`;
+  if (overall >= 60) return `La clave para ${s1.name} y ${s2.name} es la comunicación honesta. Tienen mucho potencial juntos, pero necesitan expresar lo que sienten sin guardarse nada. Celebren sus diferencias en vez de intentar cambiar al otro.`;
+  if (overall >= 45) return `Para ${s1.name} y ${s2.name} el secreto está en la paciencia. No intenten cambiar al otro, sino entender de dónde viene. Las mejores lecciones de vida vienen de personas que ven el mundo diferente a nosotros.`;
+  return `${s1.name} y ${s2.name} necesitan mucho trabajo consciente. El consejo es preguntarse: ¿estoy dispuesto/a a aceptar a esta persona tal como es? Si la respuesta es sí, tienen una base. Si no, quizás es mejor ser amigos.`;
+}
+
+let sel1 = -1, sel2 = -1;
+let resultData = null;
+
+function buildGrids() {
+  ['grid1','grid2'].forEach((gid, gi) => {
+    const grid = document.getElementById(gid);
+    grid.innerHTML = signs.map((s,i) => `
+      <div class="sign-btn" data-grid="${gi}" data-index="${i}" onclick="selectSign(${gi},${i})">
+        <span class="sign-emoji">${s.emoji}</span>
+        <span class="sign-name">${s.name}</span>
+      </div>
+    `).join('');
+  });
+}
+
+function selectSign(grid, index) {
+  if (grid === 0) sel1 = index; else sel2 = index;
+  document.querySelectorAll(`[data-grid="${grid}"]`).forEach(b => b.classList.remove('selected'));
+  document.querySelector(`[data-grid="${grid}"][data-index="${index}"]`).classList.add('selected');
+  document.getElementById('calc-btn').disabled = !(sel1 >= 0 && sel2 >= 0);
+}
+
+function calcCompat() {
+  if (sel1 < 0 || sel2 < 0) return;
+  const s1 = signs[sel1], s2 = signs[sel2];
+  const overall = compatMatrix[sel1][sel2];
+  const relation = getElementRelation(s1.element, s2.element);
+  const offsets = catOffsets[relation];
+
+  const categories = [
+    {name:'Amor',icon:'❤️',color:'#e74c3c', val: Math.min(99, Math.max(15, overall + offsets[0] + Math.floor(Math.random()*6-3)))},
+    {name:'Amistad',icon:'🤝',color:'#3498db', val: Math.min(99, Math.max(15, overall + offsets[1] + Math.floor(Math.random()*6-3)))},
+    {name:'Comunicación',icon:'💬',color:'#2ecc71', val: Math.min(99, Math.max(15, overall + offsets[2] + Math.floor(Math.random()*6-3)))},
+    {name:'Trabajo',icon:'💼',color:'#f39c12', val: Math.min(99, Math.max(15, overall + offsets[3] + Math.floor(Math.random()*6-3)))},
+    {name:'Intimidad',icon:'🔥',color:'#9b59b6', val: Math.min(99, Math.max(15, overall + offsets[4] + Math.floor(Math.random()*6-3)))}
+  ];
+
+  const desc = generateDesc(s1, s2, overall);
+  const strengths = getStrengths(s1, s2, relation);
+  const challenges = getChallenges(s1, s2, relation);
+  const advice = getAdvice(s1, s2, overall);
+
+  resultData = { s1, s2, overall, categories, desc, strengths, challenges, advice, relation };
+
+  // Render
+  document.getElementById('signs-display').innerHTML = `${s1.emoji} ${s1.name} × ${s2.name} ${s2.emoji}`;
+  
+  const label = overall >= 85 ? '¡Almas gemelas!' : overall >= 70 ? '¡Gran compatibilidad!' : overall >= 55 ? 'Buena conexión' : overall >= 40 ? 'Necesita trabajo' : 'Relación desafiante';
+  document.getElementById('compat-label').textContent = label;
+
+  document.getElementById('element-row').innerHTML = `
+    <div class="element-badge">${s1.elemEmoji} ${s1.name} — ${s1.element}</div>
+    <div class="element-badge">${s2.elemEmoji} ${s2.name} — ${s2.element}</div>
+  `;
+
+  // Animate ring
+  animateRing(overall);
+
+  // Categories
+  document.getElementById('cat-grid').innerHTML = categories.map(c => `
+    <div class="cat-item">
+      <div class="cat-icon">${c.icon}</div>
+      <div class="cat-info">
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:0%;background:${c.color};" data-target="${c.val}"></div></div>
+      </div>
+      <div class="cat-val" style="color:${c.color}">${c.val}%</div>
+    </div>
+  `).join('');
+
+  // Description
+  document.getElementById('desc-text').textContent = desc;
+
+  // Strengths & Challenges
+  document.getElementById('strengths-list').innerHTML = strengths.map(s => `<div class="trait-item">✓ ${s}</div>`).join('');
+  document.getElementById('challenges-list').innerHTML = challenges.map(c => `<div class="trait-item">⚡ ${c}</div>`).join('');
+
+  // Advice
+  document.getElementById('advice-text').textContent = advice;
+
+  // Friendship section
+  const friendOverall = categories.find(c => c.name === 'Amistad').val;
+  const friendDesc = generateFriendDesc(s1, s2, friendOverall);
+  const friendStrengths = getFriendStrengths(s1, s2, relation);
+  const friendChallenges = getFriendChallenges(s1, s2, relation);
+  const friendAdvice = getFriendAdvice(s1, s2, friendOverall);
+
+  document.getElementById('friend-desc-text').textContent = friendDesc;
+  document.getElementById('friend-strengths-list').innerHTML = friendStrengths.map(s => `<div class="trait-item">✓ ${s}</div>`).join('');
+  document.getElementById('friend-challenges-list').innerHTML = friendChallenges.map(c => `<div class="trait-item">⚡ ${c}</div>`).join('');
+  document.getElementById('friend-advice-text').textContent = friendAdvice;
+
+  resultData.friendDesc = friendDesc;
+  resultData.friendStrengths = friendStrengths;
+  resultData.friendChallenges = friendChallenges;
+  resultData.friendAdvice = friendAdvice;
+
+  document.getElementById('results-section').classList.remove('hidden');
+
+  setTimeout(() => {
+    document.querySelectorAll('.cat-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 300);
+
+  setTimeout(() => {
+    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+function animateRing(target) {
+  const canvas = document.getElementById('ring-canvas');
+  const ctx = canvas.getContext('2d');
+  const cx = 180, cy = 180, r = 150, lw = 16;
+  let current = 0;
+  const duration = 1500;
+  const start = performance.now();
+
+  function getColor(v) {
+    if (v >= 80) return '#22c55e';
+    if (v >= 60) return '#4ade80';
+    if (v >= 45) return '#f59e0b';
+    return '#e74c3c';
+  }
+
+  function draw(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    current = eased * target;
+
+    ctx.clearRect(0, 0, 360, 360);
+
+    // BG ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = '#eee';
+    ctx.lineWidth = lw;
+    ctx.stroke();
+
+    // Fill ring
+    const angle = (current / 100) * Math.PI * 2 - Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI / 2, angle);
+    ctx.strokeStyle = getColor(current);
+    ctx.lineWidth = lw;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    document.getElementById('percent-text').textContent = Math.round(current) + '%';
+    document.getElementById('percent-text').style.color = getColor(current);
+
+    if (progress < 1) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+function resetAll() {
+  sel1 = -1; sel2 = -1;
+  document.querySelectorAll('.sign-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('results-section').classList.add('hidden');
+  document.getElementById('calc-btn').disabled = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadPDF() {
+  if (!resultData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const w = 210;
+  let y = 15;
+  const d = resultData;
+
+  // Header
+  doc.setFillColor(242,242,242);
+  doc.rect(0,0,w,30,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(26,26,26);
+  doc.text('FIN',20,20);
+  doc.setTextColor(153,153,153);
+  doc.text('SILVER',34,20);
+  doc.setFontSize(9);
+  doc.text('Compatibilidad de Signos',w-20,20,{align:'right'});
+  y = 38;
+
+  doc.setFontSize(8);
+  doc.setTextColor(150,150,150);
+  doc.text('Generado el '+new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'}),20,y);
+  y += 14;
+
+  // Title
+  doc.setFontSize(18);
+  doc.setTextColor(26,26,26);
+  doc.setFont('helvetica','bold');
+  doc.text(d.s1.name + ' × ' + d.s2.name, w/2, y, {align:'center'});
+  y += 10;
+
+  // Percentage
+  const color = d.overall >= 80 ? [34,197,94] : d.overall >= 60 ? [74,222,128] : d.overall >= 45 ? [245,158,11] : [231,76,60];
+  doc.setFontSize(36);
+  doc.setTextColor(...color);
+  doc.text(d.overall + '%', w/2, y + 10, {align:'center'});
+  y += 18;
+
+  const label = d.overall >= 85 ? 'Almas gemelas' : d.overall >= 70 ? 'Gran compatibilidad' : d.overall >= 55 ? 'Buena conexión' : d.overall >= 40 ? 'Necesita trabajo' : 'Relación desafiante';
+  doc.setFontSize(11);
+  doc.setTextColor(100,100,100);
+  doc.setFont('helvetica','normal');
+  doc.text(label, w/2, y, {align:'center'});
+  y += 6;
+
+  // Elements
+  doc.setFontSize(9);
+  doc.setTextColor(120,120,120);
+  doc.text(d.s1.name + ' (' + d.s1.element + ')  ×  ' + d.s2.name + ' (' + d.s2.element + ')', w/2, y, {align:'center'});
+  y += 14;
+
+  // Categories
+  doc.setFontSize(10);
+  doc.setTextColor(150,150,150);
+  doc.setFont('helvetica','bold');
+  doc.text('COMPATIBILIDAD POR ÁREA', 20, y);
+  y += 8;
+
+  d.categories.forEach(c => {
+    doc.setFillColor(245,245,245);
+    doc.roundedRect(20, y, w-40, 10, 2, 2, 'F');
+    doc.setFontSize(9);
+    doc.setTextColor(26,26,26);
+    doc.setFont('helvetica','normal');
+    doc.text(c.name, 25, y+7);
+    doc.setFont('helvetica','bold');
+    doc.text(c.val+'%', w-25, y+7, {align:'right'});
+    // Bar
+    const barW = 80;
+    const barX = 65;
+    doc.setFillColor(230,230,230);
+    doc.roundedRect(barX, y+3, barW, 4, 1, 1, 'F');
+    const hex = c.color;
+    const r2 = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    doc.setFillColor(r2,g,b);
+    doc.roundedRect(barX, y+3, barW*(c.val/100), 4, 1, 1, 'F');
+    y += 13;
+  });
+  y += 6;
+
+  // Description
+  if (y > 200) { doc.addPage(); y = 20; }
+  doc.setFontSize(10);
+  doc.setTextColor(150,150,150);
+  doc.setFont('helvetica','bold');
+  doc.text('ANÁLISIS', 20, y);
+  y += 7;
+  doc.setFontSize(8.5);
+  doc.setTextColor(80,80,80);
+  doc.setFont('helvetica','normal');
+  const descLines = doc.splitTextToSize(d.desc, w-45);
+  doc.text(descLines, 22, y);
+  y += descLines.length * 4.2 + 8;
+
+  // Strengths & Challenges
+  if (y > 230) { doc.addPage(); y = 20; }
+  const colW = (w - 50) / 2;
+
+  doc.setFontSize(9);
+  doc.setTextColor(34,197,94);
+  doc.setFont('helvetica','bold');
+  doc.text('FORTALEZAS', 22, y);
+  doc.setTextColor(245,158,11);
+  doc.text('DESAFÍOS', 22 + colW + 10, y);
+  y += 7;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  const maxItems = Math.max(d.strengths.length, d.challenges.length);
+  for (let i = 0; i < maxItems; i++) {
+    if (d.strengths[i]) {
+      doc.setTextColor(80,80,80);
+      doc.text('✓ ' + d.strengths[i], 24, y);
+    }
+    if (d.challenges[i]) {
+      doc.setTextColor(80,80,80);
+      doc.text('⚡ ' + d.challenges[i], 24 + colW + 10, y);
+    }
+    y += 5.5;
+  }
+  y += 6;
+
+  // Advice
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFillColor(250,250,250);
+  doc.roundedRect(20, y, w-40, 22, 3, 3, 'F');
+  doc.setFontSize(7.5);
+  doc.setTextColor(150,150,150);
+  doc.setFont('helvetica','bold');
+  doc.text('CONSEJO PARA LA PAREJA', 25, y + 6);
+  doc.setFontSize(8);
+  doc.setTextColor(80,80,80);
+  doc.setFont('helvetica','normal');
+  const advLines = doc.splitTextToSize(d.advice, w - 52);
+  doc.text(advLines, 25, y + 12);
+  y += 10 + advLines.length * 4.2 + 10;
+
+  // FRIENDSHIP SECTION
+  if (y > 210) { doc.addPage(); y = 20; }
+  doc.setFontSize(10);
+  doc.setTextColor(150,150,150);
+  doc.setFont('helvetica','bold');
+  doc.text('ANÁLISIS DE LA AMISTAD', 20, y);
+  y += 7;
+  doc.setFontSize(8.5);
+  doc.setTextColor(80,80,80);
+  doc.setFont('helvetica','normal');
+  const fDescLines = doc.splitTextToSize(d.friendDesc, w-45);
+  doc.text(fDescLines, 22, y);
+  y += fDescLines.length * 4.2 + 8;
+
+  if (y > 230) { doc.addPage(); y = 20; }
+  doc.setFontSize(9);
+  doc.setTextColor(34,197,94);
+  doc.setFont('helvetica','bold');
+  doc.text('FORTALEZAS', 22, y);
+  doc.setTextColor(245,158,11);
+  doc.text('DESAFÍOS', 22 + colW + 10, y);
+  y += 7;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  const fMaxItems = Math.max(d.friendStrengths.length, d.friendChallenges.length);
+  for (let i = 0; i < fMaxItems; i++) {
+    if (d.friendStrengths[i]) {
+      doc.setTextColor(80,80,80);
+      doc.text('✓ ' + d.friendStrengths[i], 24, y);
+    }
+    if (d.friendChallenges[i]) {
+      doc.setTextColor(80,80,80);
+      doc.text('⚡ ' + d.friendChallenges[i], 24 + colW + 10, y);
+    }
+    y += 5.5;
+  }
+  y += 6;
+
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.setFillColor(250,250,250);
+  doc.roundedRect(20, y, w-40, 22, 3, 3, 'F');
+  doc.setFontSize(7.5);
+  doc.setTextColor(150,150,150);
+  doc.setFont('helvetica','bold');
+  doc.text('CONSEJO PARA LA AMISTAD', 25, y + 6);
+  doc.setFontSize(8);
+  doc.setTextColor(80,80,80);
+  doc.setFont('helvetica','normal');
+  const fAdvLines = doc.splitTextToSize(d.friendAdvice, w - 52);
+  doc.text(fAdvLines, 25, y + 12);
+  y += 28;
+
+  // Footer
+  doc.setFontSize(7);
+  doc.setTextColor(200,200,200);
+  doc.text('GRUPO FIN-SILVER', w/2, 290, {align:'center'});
+
+  doc.save('compatibilidad-signos-finsilver.pdf');
+}
+
+buildGrids();
+</script>
+</body>
+</html>
